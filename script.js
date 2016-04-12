@@ -3,18 +3,44 @@ var color = 0;
 var counter = 0;
 var discospeed = 100;
 var initialf = null;
+var lastframe = null;
 var dobsub = false;
 var doincreaseRed = false;
 var dobinsub = false;
 var dobsub2 = false;
+var dobgr2gray = false;
 var subThresh = 10;
+var action = "none";
+
+
 navigator.getUserMedia = ( navigator.getUserMedia ||
                        navigator.webkitGetUserMedia ||
                        navigator.mozGetUserMedia ||
                        navigator.msGetUserMedia);
+function updateAction(){
+	action = "";
+	if(dobsub){
+		action+="Background subtractor|"
+	}
+	else if(dobsub2){
+		action+="Background subtractor2|";
+	}
+	else if(dobinsub){
+		action+="Binary background subtractor|";
+	}
+	else if(doincreaseRed){
+		action+="Disco mode!|";
+	}
+	else{
+		action = "none";
+	}
+	document.getElementById("action").innerHTML = action;
+}
+
 function stUp(){
 	subThresh+=1;
 	document.getElementById("subThresh").innerHTML = "subtractor threshold = "+subThresh;
+	
 }
 function stdn(){
 	subThresh-=1;
@@ -31,10 +57,12 @@ function setbinsub(){
 		dobsub = false;
 		dobsub2 = false;
 	}	
+	updateAction();
 }
 function setbsub(){
 	if(dobsub2){
 		dobsub2 = false;
+		dobsub = false;
 	}
 	if(dobsub){
 		dobsub = false;
@@ -45,6 +73,7 @@ function setbsub(){
 		dobsub2 = false;
 		dobinsub = false;
 	}
+	updateAction();
 }
 
 function reset(){
@@ -57,7 +86,8 @@ function reset(){
 	discospeed = 100;
 	initialf = null;
 	document.getElementById("discospeed").innerHTML = "Disco speed = 100";
-	document.getElementById("subThresh").innerHTML = "subtractor threshold = 10";
+	subThreshElem.innerHTML = "subtractor threshold = 10";
+	updateAction();
 }
 function setdisco(){
 	if(doincreaseRed){
@@ -74,6 +104,10 @@ function setdisco(){
 		doincreaseRed = true;
 	}
 	document.getElementById("discospeed").innerHTML = "Disco speed = "+discospeed;
+	updateAction();
+}
+function setbgr2gray(){
+	dobgr2gray = !dobgr2gray;
 }
 
 function initialize(){
@@ -116,9 +150,14 @@ function draw(){
 				if(dobinsub){
 					binsub(frame.data, subThresh);
 				}
+				if(dobgr2gray){
+					bgr2gray(frame.data);
+				}
+				//motionDetect(frame.data);
+				
+				//GaussBlur(frame.data, 1.5);
 			}
 		}
-		//increaseRed(frame.data, color);
 		context.putImageData(frame, 0, 0);
 	}
 	counter+=1;
@@ -205,5 +244,89 @@ function binsub(data, thresh){
 	
 	}
 }
+
+function GaussBlur(data, sigma){
+	bgr2gray(data);
+	var len = data.length;
+	for(var i=0, j=0; j<len; i++, j+=4){
+		try{
+			var current = 0;
+			var num = 8;
+			current += data[j+4]*weight(j+4, sigma);
+			if(j>=4){
+				current += data[j-4]*weight(j-4, sigma);	
+			}
+			else{
+				num--;
+			}
+
+			current += data[j+4*width]*weight(j+4*width, sigma);
+			current += data[j+4*width+4]*weight(j+4*width+4, sigma);	
+			current += data[j+4*width-4]*weight(j+4*width-4, sigma);
+
+			if(j>=4*width){
+				current += data[j-(4*width)]*weight(j-(4*width), sigma);
+				current += data[j-(4*width)+4]*weight(j-(4*width)+4, sigma);
+				if(j-(4*width)>=4)
+					current += data[j-(4*width)-4]*weight(j-(4*width)-4, sigma);
+				else
+						num--;
+			}
+			else{
+				num-=3;
+			}
+
+			current/=num;
+			data[j] = current;
+			data[j+1] = current;
+			data[j+2] = current;
+
+		} catch(e){
+			console.log(e);
+		}
+
+	}
+}
+function bgr2gray(data){
+	var len = data.length;
+	for(var i = 0, j = 0; j<len; i++, j+=4){
+		var lumin = 0.21*data[j]+0.72*data[j+1]+0.07*data[j+2];
+		data[j] = lumin;
+		data[j+1] = lumin;
+		data[j+2] = lumin;
+	}
+}
+function weight(pos, sigma){
+	var y = pos/(4*width);
+	var x = pos - 4*width*y; 
+	var e = 2.718;
+	var pi = 3.14;
+	var exp = -1*(Math.pow(x, 2)+Math.pow(y, 2))/(2*Math.pow(sigma, 2));
+	var numerator = Math.pow(e, exp);
+	var denominator = 2*pi*Math.pow(sigma, 2);
+	return numerator/denominator;
+}
+
+function motionDetect(data){
+	var len = data.length;
+	if(!lastframe){
+		lastframe = data;
+		return;
+	}
+	var temp = data;
+	for(var i = 0, j = 0; j<len; i++, j+=4){
+		for(var k=0; k<3; k++){
+			data[j+k]-=lastframe[j+k];
+			if(data[j+k]<0){
+				data[j+k] = 0;
+			}
+			if(data[j+k]>255){
+				data[j+k]=255;
+			}
+		}			
+	}
+	lastframe = temp;
+}
+
 
 addEventListener("DOMContentLoaded", initialize);
