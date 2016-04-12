@@ -32,6 +32,12 @@ function updateAction(){
 	else if(doincreaseRed){
 		action+="Disco mode!|";
 	}
+	else if(dobgr2gray){
+		action+="BGR2GRAY|";
+	}
+	else if(dogaussblur){
+		action+="Gaussian Blur|";
+	}
 	else{
 		action = "none";
 	}
