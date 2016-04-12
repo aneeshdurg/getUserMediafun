@@ -9,6 +9,7 @@ var doincreaseRed = false;
 var dobinsub = false;
 var dobsub2 = false;
 var dobgr2gray = false;
+var dogaussblur = false;
 var subThresh = 10;
 var action = "none";
 
@@ -110,6 +111,10 @@ function setbgr2gray(){
 	dobgr2gray = !dobgr2gray;
 }
 
+function setgaussblur(){
+	dogaussblur = !dogaussblur;
+}
+
 function initialize(){
 	video = document.getElementById("vid");
 	canvas = document.getElementById("c");
@@ -154,8 +159,9 @@ function draw(){
 					bgr2gray(frame.data);
 				}
 				//motionDetect(frame.data);
-				
-				//GaussBlur(frame.data, 1.5);
+				if(dogaussblur){
+					GaussBlur(frame.data, 1.5);
+				}
 			}
 		}
 		context.putImageData(frame, 0, 0);
@@ -251,24 +257,25 @@ function GaussBlur(data, sigma){
 	for(var i=0, j=0; j<len; i++, j+=4){
 		try{
 			var current = 0;
-			var num = 8;
-			current += data[j+4]*weight(j+4, sigma);
+			var num = 9;
+			current += data[j];//*weight(j, sigma);
+			current += data[j+4];//*weight(j+4, sigma);
 			if(j>=4){
-				current += data[j-4]*weight(j-4, sigma);	
+				current += data[j-4];//*weight(j-4, sigma);	
 			}
 			else{
 				num--;
 			}
 
-			current += data[j+4*width]*weight(j+4*width, sigma);
-			current += data[j+4*width+4]*weight(j+4*width+4, sigma);	
-			current += data[j+4*width-4]*weight(j+4*width-4, sigma);
+			current += data[j+4*width];//*weight(j+4*width, sigma);
+			current += data[j+4*width+4];//*weight(j+4*width+4, sigma);	
+			current += data[j+4*width-4];//*weight(j+4*width-4, sigma);
 
 			if(j>=4*width){
-				current += data[j-(4*width)]*weight(j-(4*width), sigma);
-				current += data[j-(4*width)+4]*weight(j-(4*width)+4, sigma);
+				current += data[j-(4*width)];//*weight(j-(4*width), sigma);
+				current += data[j-(4*width)+4];//*weight(j-(4*width)+4, sigma);
 				if(j-(4*width)>=4)
-					current += data[j-(4*width)-4]*weight(j-(4*width)-4, sigma);
+					current += data[j-(4*width)-4];//*weight(j-(4*width)-4, sigma);
 				else
 						num--;
 			}
