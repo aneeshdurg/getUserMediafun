@@ -258,24 +258,24 @@ function GaussBlur(data, sigma){
 		try{
 			var current = 0;
 			var num = 9;
-			current += data[j];//*weight(j, sigma);
-			current += data[j+4];//*weight(j+4, sigma);
+			current += data[j]*0.147;//*weight(j, sigma);
+			current += data[j+4]*0.118;//*weight(j+4, sigma);
 			if(j>=4){
-				current += data[j-4];//*weight(j-4, sigma);	
+				current += data[j-4]*0.118;//*weight(j-4, sigma);	
 			}
 			else{
 				num--;
 			}
 
-			current += data[j+4*width];//*weight(j+4*width, sigma);
-			current += data[j+4*width+4];//*weight(j+4*width+4, sigma);	
-			current += data[j+4*width-4];//*weight(j+4*width-4, sigma);
+			current += data[j+4*width]*0.118;//*weight(j+4*width, sigma);
+			current += data[j+4*width+4]*0.095;//*weight(j+4*width+4, sigma);	
+			current += data[j+4*width-4]*0.095;//*weight(j+4*width-4, sigma);
 
 			if(j>=4*width){
-				current += data[j-(4*width)];//*weight(j-(4*width), sigma);
-				current += data[j-(4*width)+4];//*weight(j-(4*width)+4, sigma);
+				current += data[j-(4*width)]*0.118;//*weight(j-(4*width), sigma);
+				current += data[j-(4*width)+4]*0.095;//*weight(j-(4*width)+4, sigma);
 				if(j-(4*width)>=4)
-					current += data[j-(4*width)-4];//*weight(j-(4*width)-4, sigma);
+					current += data[j-(4*width)-4]*0.095;//*weight(j-(4*width)-4, sigma);
 				else
 						num--;
 			}
@@ -283,7 +283,7 @@ function GaussBlur(data, sigma){
 				num-=3;
 			}
 
-			current/=num;
+			//current/=num;
 			data[j] = current;
 			data[j+1] = current;
 			data[j+2] = current;
