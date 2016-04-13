@@ -1,114 +1,4 @@
-var video, canvas, context, width, height;
-var color = 0;
-var counter = 0;
-var discospeed = 100;
-var initialf = null;
-var lastframe = null;
-var dobsub = false;
-var doincreaseRed = false;
-var dobinsub = false;
-var dobsub2 = false;
-var dobgr2gray = false;
-var subThresh = 10;
-var action = "none";
 
-
-navigator.getUserMedia = ( navigator.getUserMedia ||
-                       navigator.webkitGetUserMedia ||
-                       navigator.mozGetUserMedia ||
-                       navigator.msGetUserMedia);
-function updateAction(){
-	action = "";
-	if(dobsub){
-		action+="Background subtractor|"
-	}
-	else if(dobsub2){
-		action+="Background subtractor2|";
-	}
-	else if(dobinsub){
-		action+="Binary background subtractor|";
-	}
-	else if(doincreaseRed){
-		action+="Disco mode!|";
-	}
-	else{
-		action = "none";
-	}
-	document.getElementById("action").innerHTML = action;
-}
-
-function stUp(){
-	subThresh+=1;
-	document.getElementById("subThresh").innerHTML = "subtractor threshold = "+subThresh;
-	
-}
-function stdn(){
-	subThresh-=1;
-	document.getElementById("subThresh").innerHTML = "subtractor threshold = "+subThresh;
-}
-
-
-function setbinsub(){
-	if(dobinsub){
-		dobinsub = false;
-	}
-	else{
-		dobinsub = true;
-		dobsub = false;
-		dobsub2 = false;
-	}	
-	updateAction();
-}
-function setbsub(){
-	if(dobsub2){
-		dobsub2 = false;
-		dobsub = false;
-	}
-	if(dobsub){
-		dobsub = false;
-		dobsub2 = true;	
-	}
-	else{
-		dobsub = true;
-		dobsub2 = false;
-		dobinsub = false;
-	}
-	updateAction();
-}
-
-function reset(){
-	dobsub = false;
-	dobsub2 = false;
-	dobinsub = false;
-	doincreaseRed = false;
-	color = 0;
-	counter = 0;
-	discospeed = 100;
-	initialf = null;
-	document.getElementById("discospeed").innerHTML = "Disco speed = 100";
-	subThreshElem.innerHTML = "subtractor threshold = 10";
-	updateAction();
-}
-function setdisco(){
-	if(doincreaseRed){
-		if(discospeed>10){
-			discospeed-=10;
-		}
-		discospeed-=1;
-		if(discospeed<=0){
-			doincreaseRed = false;
-			discospeed = 100;
-		}
-	}
-	else{
-		doincreaseRed = true;
-	}
-	document.getElementById("discospeed").innerHTML = "Disco speed = "+discospeed;
-	updateAction();
-}
-function setbgr2gray(){
-	dobgr2gray = !dobgr2gray;
-}
 
 function initialize(){
 	video = document.getElementById("vid");
@@ -154,8 +44,12 @@ function draw(){
 					bgr2gray(frame.data);
 				}
 				//motionDetect(frame.data);
-				
-				//GaussBlur(frame.data, 1.5);
+				if(dogaussblur){
+					GaussBlur(frame.data, 1.5);
+				}
+				if(docrop){
+					crop(xs, xe, ys, ye, frame.data);
+				}
 			}
 		}
 		context.putImageData(frame, 0, 0);
@@ -251,24 +145,25 @@ function GaussBlur(data, sigma){
 	for(var i=0, j=0; j<len; i++, j+=4){
 		try{
 			var current = 0;
-			var num = 8;
-			current += data[j+4]*weight(j+4, sigma);
+			var num = 9;
+			current += data[j]*0.147;//*weight(j, sigma);
+			current += data[j+4]*0.118;//*weight(j+4, sigma);
 			if(j>=4){
-				current += data[j-4]*weight(j-4, sigma);	
+				current += data[j-4]*0.118;//*weight(j-4, sigma);	
 			}
 			else{
 				num--;
 			}
 
-			current += data[j+4*width]*weight(j+4*width, sigma);
-			current += data[j+4*width+4]*weight(j+4*width+4, sigma);	
-			current += data[j+4*width-4]*weight(j+4*width-4, sigma);
+			current += data[j+4*width]*0.118;//*weight(j+4*width, sigma);
+			current += data[j+4*width+4]*0.095;//*weight(j+4*width+4, sigma);	
+			current += data[j+4*width-4]*0.095;//*weight(j+4*width-4, sigma);
 
 			if(j>=4*width){
-				current += data[j-(4*width)]*weight(j-(4*width), sigma);
-				current += data[j-(4*width)+4]*weight(j-(4*width)+4, sigma);
+				current += data[j-(4*width)]*0.118;//*weight(j-(4*width), sigma);
+				current += data[j-(4*width)+4]*0.095;//*weight(j-(4*width)+4, sigma);
 				if(j-(4*width)>=4)
-					current += data[j-(4*width)-4]*weight(j-(4*width)-4, sigma);
+					current += data[j-(4*width)-4]*0.095;//*weight(j-(4*width)-4, sigma);
 				else
 						num--;
 			}
@@ -276,7 +171,7 @@ function GaussBlur(data, sigma){
 				num-=3;
 			}
 
-			current/=num;
+			//current/=num;
 			data[j] = current;
 			data[j+1] = current;
 			data[j+2] = current;
@@ -305,6 +200,17 @@ function weight(pos, sigma){
 	var numerator = Math.pow(e, exp);
 	var denominator = 2*pi*Math.pow(sigma, 2);
 	return numerator/denominator;
+}
+
+function crop(xstrt, xend, ystrt, yend, data){
+	var len = data.length/4;
+	for(var i=0; i<len; i++){
+		if(i%width>xend||i%width<xstrt||i/width>yend||i/width<ystrt){
+			data[i*4] = 0;
+			data[i*4+1] = 0;
+			data[i*4+2] = 0;
+		}
+	}
 }
 
 function motionDetect(data){
