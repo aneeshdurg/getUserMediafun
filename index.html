@@ -2,6 +2,7 @@
 <html>
 	<head>
 		<title>getUserMedia() fun</title>
+		<script src="controls.js"></script>
 		<script src="script.js"></script>
 	</head>
 
@@ -18,6 +19,16 @@
 		<button onclick="setdisco()">Disco time!</button>
 		<button onclick="setbgr2gray()">BGR2GRAY</button>
 		<button onclick="setgaussblur()">Gaussian Blur</button>
+		<br></br>
+		<button onclick="setcrop()">Crop</button>
+		<button onclick="xsdelta(true)">xs+</button>
+		<button onclick="xsdelta(false)">xs-</button>
+		<button onclick="xedelta(true)">xe+</button>
+		<button onclick="xedelta(false)">xe-</button>
+		<button onclick="ysdelta(true)">ys+</button>
+		<button onclick="ysdelta(false)">ys-</button>
+		<button onclick="yedelta(true)">ye+</button>
+		<button onclick="yedelta(false)">ye-</button><br></br>
 		<button onclick="reset()">RESET</button>
 		<br></br>
 		<p id="discospeed">Disco speed = 100</p>
