@@ -128,7 +128,7 @@ function setdisco(){
 }
 function setbgr2gray(){
 	dobgr2gray = !dobgr2gray;
-
+}
 
 function setgaussblur(){
 	dogaussblur = !dogaussblur;
