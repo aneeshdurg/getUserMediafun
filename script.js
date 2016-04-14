@@ -52,6 +52,7 @@ function draw(){
 				
 				if(dothresh){
 					threshold(frame.data, t, 0, 255);
+					removeNoise(frame.data, noiseThresh, 255, 0);
 				}
 				if(docrop){
 					crop(xs, xe, ys, ye, frame.data);
@@ -272,6 +273,41 @@ function threshold(data, thresh, a, b){
 			data[i] = b;
 			data[i+1] = b;
 			data[i+2] = b;
+		}
+	}
+}
+
+function removeNoise(data, t, a, b){
+	var len = data.length;
+	var n = 0;
+	for(var i = 0; i<len; i+=4){
+		if(data[i]==a){
+			n++;
+		}
+		else{
+			if(n<t){
+				if(!(data[i+4]==a||data[i+8]==a||data[i+12]==a)){
+					var j = i;
+					while(n>0){
+						data[j] = b;
+						data[j+1] = b;
+						data[j+2] = b;
+						j-=4;
+						n--;
+					}
+				}
+				else{
+					var j = i;
+					while(n>0){
+						data[j] = a;
+						data[j+1] = a;
+						data[j+2] = a;
+						j-=4;
+						n--;
+					}	
+				}
+			}
+			n = 0;
 		}
 	}
 }

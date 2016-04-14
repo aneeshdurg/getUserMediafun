@@ -19,6 +19,7 @@ var action = "none";
 var docrop = false;
 var dothresh = false;
 var t = 0;
+var noiseThresh = 0;
 
 navigator.getUserMedia = ( navigator.getUserMedia ||
                        navigator.webkitGetUserMedia ||
@@ -180,4 +181,13 @@ function threshup(incr){
 }
 function setthresh(){
 	dothresh = !dothresh;
+}
+
+function nthreshdelta(incr){
+	if(incr){
+		noiseThresh++;
+	}
+	else{
+		noiseThresh--;
+	}
 }

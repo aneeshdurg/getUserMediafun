@@ -7,6 +7,7 @@
 		<script> 
 function start(){
 	dogaussblur = !dogaussblur;
+	//dobinsub = !dobinsub;
 	dothresh = !dothresh;
 	docrop = !docrop;	
 }
@@ -30,8 +31,11 @@ function start(){
 		<button onclick="yedelta(true)">ye+</button>
 		<button onclick="yedelta(false)">ye-</button>
 		<br></br>
-		<p id="discospeed">Disco speed = 100</p>
-		<br></br>
-		<p id="subThresh">subtractor threshold = 10</p>
-		<br></br>
+		<button onclick="nthreshdelta(true)">+</button>
+		<button onclick="nthreshdelta(false)">-</button>
+		<br>
+		<p id="discospeed" hidden>Disco speed = 100</p>
+		<br hidden>
+		<p id="subThresh" hidden>subtractor threshold = 10</p>
+		<br hidden>
 		<p id="count"></p>
