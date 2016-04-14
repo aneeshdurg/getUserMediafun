@@ -49,10 +49,15 @@ function draw(){
 				if(dogaussblur){
 					GaussBlur(frame.data, 1.5);
 				}
+				
+				if(dothresh){
+					threshold(frame.data, t, 0, 255);
+				}
 				if(docrop){
 					crop(xs, xe, ys, ye, frame.data);
 				}
-				flip(frame.data);
+				document.getElementById("count").innerHTML = countWhite(frame.data);
+				//flip(frame.data);
 			}
 		}
 		context.putImageData(frame, 0, 0);
@@ -67,7 +72,10 @@ function draw(){
 
 function readFrame(){
 	try{
-		context.drawImage(video, 0, 0, width, height);
+		context.save();
+		context.scale(-1, 1);
+		context.drawImage(video, -width, 0, width, height);
+		context.restore();
 	} catch(e){
 		console.log(e);
 		return null;
@@ -238,7 +246,45 @@ function motionDetect(data){
 	lastframe = temp;
 }
 
-function flip(data){
+function funky(data){
+	var len = data.length;
+	for(var h = 0; h<height; h++){
+		for(var i = 0; i<=width/2; i++){
+			for(var k = 0; k<3; k++){
+				temp = data[h*4*width+i*4+k];
+				data[h*4*width+i*4+k] = data[h*width+width*4-i*4+k];
+				data[h*width+width*4-i*4+k] = temp;
+			}
+		}
+	}
+}
+
+function threshold(data, thresh, a, b){
+	bgr2gray(data);
+	var len = data.length;
+	for(var i=0; i<len; i+=4){
+		if(data[i]>thresh){
+			data[i] = a;
+			data[i+1] = a;
+			data[i+2] = a;
+		}
+		else{
+			data[i] = b;
+			data[i+1] = b;
+			data[i+2] = b;
+		}
+	}
+}
+
+function countWhite(data){
+	var len = data.length;
+	var ret = 0;
+	for(var i = 0; i<len; i+=4){
+		if(data[i]==255){
+			ret+=1;
+		}
+	}
+	return ret;
 }
 
 addEventListener("DOMContentLoaded", initialize);

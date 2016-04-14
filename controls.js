@@ -17,6 +17,8 @@ var dogaussblur = false;
 var subThresh = 10;
 var action = "none";
 var docrop = false;
+var dothresh = false;
+var t = 0;
 
 navigator.getUserMedia = ( navigator.getUserMedia ||
                        navigator.webkitGetUserMedia ||
@@ -126,7 +128,7 @@ function setdisco(){
 }
 function setbgr2gray(){
 	dobgr2gray = !dobgr2gray;
-}
+
 
 function setgaussblur(){
 	dogaussblur = !dogaussblur;
@@ -134,36 +136,48 @@ function setgaussblur(){
 
 function xsdelta(incr){
 	if(incr){
-		xs++;
+		xs+=5;
 	}
 	else{
-		xs--;
+		xs-=5;
 	}
 }
 function xedelta(incr){
 	if(incr){
-		xe--;
+		xe-=5;
 	}
 	else{
-		xe++;
+		xe+=5;
 	}
 }
 function ysdelta(incr){
 	if(incr){
-		ys++;
+		ys+=5;
 	}
 	else{
-		ys--;
+		ys-=5;
 	}
 }
 function yedelta(incr){
 	if(incr){
-		ye--;
+		ye-=5;
 	}
 	else{
-		ye++;
+		ye+=5;
 	}
 }
 function setcrop(){
 	docrop = !docrop;
+}
+
+function threshup(incr){
+	if(incr){
+		t++;
+	}
+	else{
+		t--;
+	}
+}
+function setthresh(){
+	dothresh = !dothresh;
 }
