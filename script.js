@@ -9,6 +9,8 @@ function initialize(){
 	height = 480; 
 	canvas.width = width;
 	canvas.height = height;
+	xe = width;
+	ye = height;
 
 	navigator.getUserMedia({video:true}, startStream, function(){});
 }
@@ -50,6 +52,7 @@ function draw(){
 				if(docrop){
 					crop(xs, xe, ys, ye, frame.data);
 				}
+				flip(frame.data);
 			}
 		}
 		context.putImageData(frame, 0, 0);
@@ -146,6 +149,7 @@ function GaussBlur(data, sigma){
 		try{
 			var current = 0;
 			var num = 9;
+			
 			current += data[j]*0.147;//*weight(j, sigma);
 			current += data[j+4]*0.118;//*weight(j+4, sigma);
 			if(j>=4){
@@ -234,5 +238,7 @@ function motionDetect(data){
 	lastframe = temp;
 }
 
+function flip(data){
+}
 
 addEventListener("DOMContentLoaded", initialize);

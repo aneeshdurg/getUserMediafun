@@ -3,9 +3,9 @@ var color = 0;
 var counter = 0;
 var discospeed = 100;
 var xs = 0;
-var xe = width;
+var xe = 0;
 var ys = 0;
-var ye = height;
+var ye = 0;
 var initialf = null;
 var lastframe = null;
 var dobsub = false;
@@ -94,6 +94,11 @@ function reset(){
 	doincreaseRed = false;
 	dobgr2gray = false;
 	dogaussblur = false;
+	docrop = false;
+	xs = 0;
+	xe = width;
+	ys = 0;
+	ye = height;
 	color = 0;
 	counter = 0;
 	discospeed = 100;
@@ -137,10 +142,10 @@ function xsdelta(incr){
 }
 function xedelta(incr){
 	if(incr){
-		xe++;
+		xe--;
 	}
 	else{
-		xe--;
+		xe++;
 	}
 }
 function ysdelta(incr){
@@ -153,10 +158,10 @@ function ysdelta(incr){
 }
 function yedelta(incr){
 	if(incr){
-		ye++;
+		ye--;
 	}
 	else{
-		ye--;
+		ye++;
 	}
 }
 function setcrop(){
